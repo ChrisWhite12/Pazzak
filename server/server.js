@@ -1,5 +1,9 @@
-const io = require('socket.io')()
-const port = 3000
+const app = require('express')()
+const http = require('http').createServer(app)
+const io = require('socket.io')(http)
+// const port = 3000
+
+
 
 io.on('connection', client => {
     client.emit('blah') 
@@ -28,17 +32,28 @@ io.on('connection', client => {
             console.log('numClients')
             console.log(numClients)
         }
+        if (numClients === 0) {
+            client.emit('unknownCode');
+            return;
+        } else if (numClients > 1) {
+            client.emit('tooManyPlayers');
+            return;
+        }
 
         clientRooms[client.id] = roomName;
-        console.log(clientRooms)
         client.join(roomName);
+        // client.emit('start', roomName)
+        console.log(room)
+        io.in(roomName).emit('start',roomName)
+        
     }
 
     function handleNewGame() {
         let roomName = makeid(5);           //check if code already exists
         clientRooms[client.id] = roomName;
-        console.log('handle new game')
-        console.log(roomName)
+        client.emit('gameCode',roomName)
+        // console.log('handle new game')
+        // console.log(roomName)
         client.join(roomName);
     }
 })
@@ -55,4 +70,6 @@ function makeid(length) {
     return result;
 }
 
-io.listen(port);
+http.listen(4000, function() {
+    console.log('listening on port 4000')
+  })
