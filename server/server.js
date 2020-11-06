@@ -1,18 +1,18 @@
 const app = require('express')()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
-// const port = 3000
-
-
 
 io.on('connection', client => {
-    client.emit('blah') 
 
     client.on('newGame', handleNewGame);
     client.on('joinGame', handleJoinGame);
+    client.on('getCard', handleGetCard);
+    client.on('playCard', handlePlayCard);
+    client.on('playerStay', handlePlayerStay);
 
 
     let clientRooms = {}
+    let state = {}
 
     function handleJoinGame(roomName) {
         console.log(roomName)
@@ -42,19 +42,41 @@ io.on('connection', client => {
 
         clientRooms[client.id] = roomName;
         client.join(roomName);
+        client.number = 2;
         // client.emit('start', roomName)
         console.log(room)
-        io.in(roomName).emit('start',roomName)
-        
+        io.sockets.in(roomName).emit('start',roomName)
+        // state.deck = new Deck()
+        // console.log(state.deck.deck)
+        // console.log(state.deck.deck.drawcard())
+        // console.log(state.deck.deck.drawcard())
+        // console.log(state.deck.deck.drawcard())
     }
 
     function handleNewGame() {
         let roomName = makeid(5);           //check if code already exists
+        
+
         clientRooms[client.id] = roomName;
         client.emit('gameCode',roomName)
         // console.log('handle new game')
         // console.log(roomName)
         client.join(roomName);
+        const room = io.sockets.adapter.rooms[roomName];
+        client.number = 1;
+        console.log(room)
+    }
+
+    function handlePlayerStay(){
+
+    }
+
+    function handleGetCard() {
+
+    }
+
+    function handlePlayCard() {
+        
     }
 })
 

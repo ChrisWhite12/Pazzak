@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+#board_grid{
+  display: grid;
+  grid-template-rows: 1fr 2fr 2fr 1fr;
+  grid-template-columns: 1fr 3fr 1fr;
+  height: 100vh;
+  width: 100vw;
+}
+
+#p1_main{
+  border: 2px solid black;
+  grid-column: 2/3;
+  grid-row: 3/4;
+}
+
+#p2_main{
+  border: 2px solid black;
+  grid-column: 2/3;
+  grid-row: 2/3;
+}

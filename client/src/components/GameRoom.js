@@ -1,40 +1,59 @@
 import React, {Component} from 'react'
+import Deck from '../models/deckmodel'
 
 class GameRoom extends Component{
     constructor(props){
         super(props)
         this.state = {
+            player: 0,
             page: props.page,
             game_code: 'xyz123',
             play_no: 1,
-            play_max: 2
+            play_max: 2,
+            deck: {}
         }
         if(this.state.page == 'host'){
             props.socket.emit('newGame'); 
             props.socket.on('gameCode', this.handleGameCode.bind(this))
         }
-
+        props.socket.on('start', this.handleStart.bind(this))
         console.log(this.state.page)
     }
 
     handleStart(room){
-        console.log('start')
-        console.log(room)
         this.setState({
-            page: 'start'
+            page: 'start',
+            deck: new Deck()
         })
+        console.log(this.state.deck.deck)
+        console.log(this.state.deck.drawcard())
+        console.log(this.state.deck.drawcard())
+
+        //display side card select screen
+
+        //when card chosen -> main loop
+
+        //emit getCard 2 times for each player (returns card from server and saves in this.state.main ??)
+    
+        //select random player
+
+        //set event listener for card click, if player turn emit playCard (changes state on server)
+
+        //set event listener for deal click, emit getCard 
+
+        //set event listener for stay click, emit stay
+
+        //if stay wait for allStay
+
+        //check scores
     }
 
     handleJoin(){
         
         const code = document.getElementById("join_text").value;
 
-        console.log('handle join')
-
         this.setState({code: code})
-        this.props.socket.emit('joinGame', code);
-        this.props.socket.on('start', this.handleStart.bind(this))
-        
+        this.props.socket.emit('joinGame', code);        
     }
 
     handleGameCode(gameCode) {
@@ -66,7 +85,16 @@ class GameRoom extends Component{
             )
         }
         else{
-            render_out = (<h1>Game Room</h1>)
+            render_out = (
+                <div id="board_grid">
+                    <div id="p2_main">
+
+                    </div>
+                    <div id="p1_main">
+
+                    </div>
+                </div>
+            )
         }
 
         return (
