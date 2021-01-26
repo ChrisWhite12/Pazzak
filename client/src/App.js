@@ -35,7 +35,7 @@ function App() {
             <Route path="/" exact component={Menu} />
             <Route path="/join" render={props => <GameRoom page='join' socket={socket} />}/>
             <Route path="/new" exact render={props => <GameRoom page='host' socket={socket} />} />
-            <Route path="/shop" exact component={Shop} />
+            {/* <Route path="/shop" exact component={Shop} /> */}
             <Route path="/register" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
           </Switch>

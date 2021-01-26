@@ -15,7 +15,7 @@ io.on('connection', client => {
     let state = {}
 
     function handleJoinGame(roomName) {
-        console.log(roomName)
+        console.log('joingame ',roomName)
 
         const room = io.sockets.adapter.rooms[roomName];
 
@@ -45,6 +45,7 @@ io.on('connection', client => {
         client.number = 2;
         // client.emit('start', roomName)
         console.log(room)
+        console.log('emitting start')
         io.sockets.in(roomName).emit('start',roomName)
         // state.deck = new Deck()
         // console.log(state.deck.deck)
@@ -84,7 +85,7 @@ io.on('connection', client => {
 
 function makeid(length) {
     var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
        result += characters.charAt(Math.floor(Math.random() * charactersLength));

@@ -1,33 +1,78 @@
-import React, {Component} from 'react'
+import React, {useEffect, useState} from 'react'
 import Deck from '../models/deckmodel'
 
-class GameRoom extends Component{
-    constructor(props){
-        super(props)
-        this.state = {
-            player: 0,
-            page: props.page,
-            game_code: 'xyz123',
-            play_no: 1,
-            play_max: 2,
-            deck: {}
-        }
-        if(this.state.page == 'host'){
-            props.socket.emit('newGame'); 
-            props.socket.on('gameCode', this.handleGameCode.bind(this))
-        }
-        props.socket.on('start', this.handleStart.bind(this))
-        console.log(this.state.page)
+const GameRoom = ({page,socket}) => {
+
+    const initGameState = {
+        player: 0,
+        game_code: '',
+        play_no: 1,
+        play_max: 2,
+        deck: {},
+        main_hand: [],
+        side_hand: []
     }
 
-    handleStart(room){
-        this.setState({
-            page: 'start',
+    const [gameState, setGameState] = useState(initGameState)
+    const [pageState, setPageState] = useState(page)
+    const [renderOut, setRenderOut] = useState()
+
+    useEffect(() => {
+        console.log(page)
+        socket.on('start', handleStart)
+
+        if(pageState === 'join'){
+            setRenderOut(
+                <div>
+                    <h1>Join Game</h1>
+                    <input id="join_text" type="text"></input>
+                    <button onClick={handleJoin}>Join</button>
+                    {gameState.game_code}
+                </div>
+            )
+        }
+        else if(pageState === 'host'){
+            console.log(gameState)
+            if(gameState.game_code == '')
+            {
+                socket.emit('newGame'); 
+                socket.on('gameCode', handleGameCode)
+            }
+            setRenderOut(
+                <div>
+                    <h1>New Game</h1>
+                    <p>Game code is: {gameState.game_code}</p>
+                    <p>Number of players {gameState.play_no}/{gameState.play_max}</p>
+                </div>
+            )
+        }
+        else if(pageState === 'start'){
+            setRenderOut(
+                <div id="board_grid">
+                    <div id="p2_main">
+
+                    </div>
+                    <div id="p1_main">
+
+                    </div>
+                </div>
+            )
+        }
+    },[gameState])
+
+    const handleStart = (room) => {
+        console.log('in handleStart')
+        setGameState({
+            ...gameState,
             deck: new Deck()
         })
-        console.log(this.state.deck.deck)
-        console.log(this.state.deck.drawcard())
-        console.log(this.state.deck.drawcard())
+        setPageState('start')
+        console.log(gameState)
+
+        // setGameState({
+        //     ...gameState,
+        //     main_hand: [gameState.deck.drawcard(),gameState.deck.drawcard()]
+        // })
 
         //display side card select screen
 
@@ -48,61 +93,25 @@ class GameRoom extends Component{
         //check scores
     }
 
-    handleJoin(){
+    const handleJoin = () => {
         
         const code = document.getElementById("join_text").value;
 
-        this.setState({code: code})
-        this.props.socket.emit('joinGame', code);        
+        // this.setState({code: code})
+        socket.emit('joinGame', code);        
     }
 
-    handleGameCode(gameCode) {
-        console.log('handleGameCode')
-        this.setState({game_code: gameCode})
+    const handleGameCode = (gameCode) => {
+        console.log('handleGameCode', gameCode)
+        setGameState({...gameState, game_code: gameCode})
     }
 
-
-    render(){
-        const {page, code} = this.state
-        let render_out
-        if(page === 'join'){
-            render_out = (
-                <div>
-                    <h1>Join Game</h1>
-                    <input id="join_text" type="text"></input>
-                    <button onClick={() => this.handleJoin()}>Join</button>
-                    {code}
-                </div>
-            )
-        }
-        else if(page === 'host'){
-            render_out = (
-                <div>
-                    <h1>New Game</h1>
-                    <p>Game code is: {this.state.game_code}</p>
-                    <p>Number of players {this.state.play_no}/{this.state.play_max}</p>
-                </div>
-            )
-        }
-        else{
-            render_out = (
-                <div id="board_grid">
-                    <div id="p2_main">
-
-                    </div>
-                    <div id="p1_main">
-
-                    </div>
-                </div>
-            )
-        }
-
-        return (
-            <div>
-                {render_out}
-            </div>
-        )
-    }
+    return (
+        <div>
+            <h1>GameRoom</h1>
+            {renderOut}
+        </div>
+    )
 }
 
 export default GameRoom
